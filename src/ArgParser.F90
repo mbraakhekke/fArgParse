@@ -215,7 +215,9 @@ contains
       real :: arg_value_real
       character(:), target, allocatable :: embedded_value
       class(*), allocatable :: args
-
+#ifdef __PGI__
+      character(:), allocatable :: s
+#endif
       integer :: ith
 
       _UNUSED_DUMMY(unused)
@@ -233,7 +235,12 @@ contains
 
             select type (args)
             type is (String)
+#ifdef __PGI__
+               s = args%string
+               call opt%act(option_values, this, s)
+#else
                call opt%act(option_values, this, args%string)
+#endif
             class default
                call opt%act(option_values, this, args)
             end select
@@ -278,7 +285,7 @@ contains
       ! Workaround for gfortran-8.2  - default assignment for complex maps is broken?
       call this%parse_args_kludge(option_values, arguments, unprocessed=unprocessed)
 !!$      call option_values%deepCopy(this%parse_args(arguments, unprocessed=unprocessed))
-      
+
    end subroutine parse_args_kludge_command_line
 
 
@@ -298,6 +305,9 @@ contains
       real :: arg_value_real
       character(:), target, allocatable :: embedded_value
       class(*), allocatable :: args
+#ifdef __PGI__
+      character(:), allocatable :: s
+#endif
 
       integer :: ith
 
@@ -316,7 +326,12 @@ contains
 
             select type (args)
             type is (String)
+#ifdef __PGI__
+               s = args%string
+               call opt%act(option_values, this, s)
+#else
                call opt%act(option_values, this, args%string)
+#endif
             class default
                call opt%act(option_values, this, args)
             end select
